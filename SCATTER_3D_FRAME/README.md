@@ -10,7 +10,7 @@
 - [x] 格林函数计算
 - [x] EFIE/MFIE 非对角阻抗矩阵
 - [x] CFIE 组合与右端项
-- [ ] 矩阵直接求解（LU分解）
+- [ ] EFIE/MFIE 对角阻抗矩阵
 - [ ] 矩阵迭代求解（GMRES）
 - [ ] 快速算法（MLFMM/ACA）
 - [ ] 并行计算（OpenMP/MPI）
