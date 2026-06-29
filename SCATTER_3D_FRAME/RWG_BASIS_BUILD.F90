@@ -1,0 +1,82 @@
+MODULE RWG_BASIS_BUILD
+    USE EM_TYPES
+    IMPLICIT NONE
+CONTAINS
+
+    ! 建立RWG基函数（统计公共边数量，为每个边建立RWG基函数）
+    SUBROUTINE BUILD_RWG_BASIS(MESH)
+        TYPE(MESH_3D), INTENT(INOUT) :: MESH
+        INTEGER :: I, J, K
+        
+        K = 1
+
+        ! 统计RWG基函数的个数
+        DO I = 1, MESH%NUM_EDGE
+            IF(MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
+                MESH%RWG_NUM = MESH%RWG_NUM + 1
+            END IF
+        END DO
+        
+        IF (ALLOCATED(MESH%RWG_BASES)) DEALLOCATE(MESH%RWG_BASES)
+        ALLOCATE(MESH%RWG_BASES(MESH%RWG_NUM))
+
+        ! 找个每个公共边对应的ID
+        DO I = 1, MESH%NUM_EDGE
+            IF(MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
+                MESH%RWG_BASES(K)%EDGE_ID = I
+                K = K + 1
+            END IF
+        END DO
+
+        DO I = 1, MESH%RWG_NUM ! 边循环
+            MESH%RWG_BASES(I)%POS_TRI_ID = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%SHARED_TRI_IDS(1)
+            MESH%RWG_BASES(I)%NEG_TRI_ID = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%SHARED_TRI_IDS(2)
+
+            ! 找到每个公共边对应的长度
+            MESH%RWG_BASES(I)%LENGTH = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH
+
+            ! 找到公共边的对顶点
+            DO J = 1, 3 
+                IF (MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V1_ID .AND. &
+                    MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V2_ID) THEN
+                    MESH%RWG_BASES(I)%POS_OPP_VERTEX = MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%VERTEX_3D(J)
+                END IF
+                IF (MESH%TRIANGLES(MESH%RWG_BASES(I)%NEG_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V1_ID .AND. &
+                    MESH%TRIANGLES(MESH%RWG_BASES(I)%NEG_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V2_ID) THEN
+                    MESH%RWG_BASES(I)%NEG_OPP_VERTEX = MESH%TRIANGLES(MESH%RWG_BASES(I)%NEG_TRI_ID)%VERTEX_3D(J)
+                END IF
+            END DO
+            
+            !  计算f（r）的系数
+            MESH%RWG_BASES(I)%POS_COEF = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH / &
+                                            (2.0 * (MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%AREA))
+            MESH%RWG_BASES(I)%NEG_COEF = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH / &
+                                            (2.0 * (MESH%TRIANGLES(MESH%RWG_BASES(I)%NEG_TRI_ID)%AREA))
+            
+        END DO
+    END SUBROUTINE
+
+    ! 对某一个RWG基函数，计算f（r）(3维，X,Y,Z)
+    SUBROUTINE EVAL_RWG_BASIS(MESH, RWG, TRI_LOCAL, R_PT, F_VAL)
+        TYPE(MESH_3D), INTENT(IN) :: MESH
+        TYPE(RWG_BASIS), INTENT(IN) :: RWG
+        CHARACTER * 3, INTENT(IN) :: TRI_LOCAL
+        REAL, INTENT(IN) :: R_PT(3) ! 场点全局坐标
+        REAL, INTENT(OUT) :: F_VAL(3)
+
+
+        IF (TRI_LOCAL == "POS") THEN
+            F_VAL(1) = RWG%POS_COEF * (R_PT(1) - MESH%NODES(RWG%POS_OPP_VERTEX)%X)
+            F_VAL(2) = RWG%POS_COEF * (R_PT(2) - MESH%NODES(RWG%POS_OPP_VERTEX)%Y)
+            F_VAL(3) = RWG%POS_COEF * (R_PT(3) - MESH%NODES(RWG%POS_OPP_VERTEX)%Z)
+        END IF
+
+        IF (TRI_LOCAL == "NEG") THEN
+            F_VAL(1) = -RWG%NEG_COEF * (R_PT(1) - MESH%NODES(RWG%NEG_OPP_VERTEX)%X)
+            F_VAL(2) = -RWG%NEG_COEF * (R_PT(2) - MESH%NODES(RWG%NEG_OPP_VERTEX)%Y)
+            F_VAL(3) = -RWG%NEG_COEF * (R_PT(3) - MESH%NODES(RWG%NEG_OPP_VERTEX)%Z)
+        END IF
+
+    END SUBROUTINE
+
+END MODULE
