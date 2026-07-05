@@ -46,7 +46,7 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! 通过面积坐标，得到编号为TRI_ID的三角形的全局坐标
+    ! 通过面积坐标，得到编号为TRI_ID的三角形的高斯积分点的全局坐标
     SUBROUTINE GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_ID, GDATA, GLOBAL_PTS)
         TYPE(MESH_3D), INTENT(IN) :: MESH
         TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
