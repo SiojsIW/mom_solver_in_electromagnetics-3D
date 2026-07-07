@@ -124,4 +124,21 @@ CONTAINS
 
     END SUBROUTINE
 
+    ! 实现奇异性提取后的光滑核函数，用于同一三角形上的数值积分
+    COMPLEX FUNCTION GREEN_FUNC_SMOOTH2(R, RP, K) RESULT(G)
+        REAL, INTENT(IN) :: R(3) ! 场点坐标
+        REAL, INTENT(IN) :: RP(3) ! 源点坐标
+        REAL, INTENT(IN) :: K  ! 波数
+        REAL :: DIST
+        COMPLEX :: PHASE
+
+        DIST = SQRT(SUM((R - RP) ** 2)) ! 场点与源点距离
+        IF (DIST < 1.0E-10) THEN
+            G = -(0.0, 1.0) * K / (4.0 * PI)
+        ELSE
+            PHASE = CEXP((0.0, -1.0) * K * DIST)
+            G = (PHASE - (1.0, 0.0) + 0.5 * K**2 * DIST**2) / (4.0 * PI * DIST)
+        END IF
+    END FUNCTION
+
 END MODULE
