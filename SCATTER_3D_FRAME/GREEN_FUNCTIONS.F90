@@ -101,6 +101,53 @@ CONTAINS
 
     END SUBROUTINE
 
+    ! 计算一个三角形对上的四个积分I1,I2,I3,I4，（计算EFIE对角矩阵元素用，G_SMOOTH）
+    SUBROUTINE CALC_GREEN_SMOOTH_INTEGALS(MESH, TRI_A, TRI_B, GDATA, K, I1, I2, I3, I4)
+        TYPE(MESH_3D), INTENT(IN) :: MESH
+        TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
+        INTEGER, INTENT(IN) :: TRI_A ! 源三角形
+        INTEGER, INTENT(IN) :: TRI_B ! 场三角形
+        REAL, INTENT(IN) :: K  ! 波数
+        COMPLEX, INTENT(OUT) :: I1 ! 标量
+        COMPLEX, INTENT(OUT) :: I4 ! 标量
+        COMPLEX, INTENT(OUT) :: I2(3) ! 矢量
+        COMPLEX, INTENT(OUT) :: I3(3) ! 矢量
+    
+        REAL :: AREA_A, AREA_B
+        REAL :: GLOBAL_PTS_A(3, GDATA%N_POINTS), GLOBAL_PTS_B(3, GDATA%N_POINTS) ! 三角形高斯积分点的全局坐标
+        INTEGER :: I, J
+        COMPLEX :: G
+        I1 = (0.0, 0.0)
+        I4 = (0.0, 0.0)
+        I2 = (0.0, 0.0)   ! 标量复数自动广播到3个元素
+        I3 = (0.0, 0.0)
+
+        AREA_A = MESH%TRIANGLES(TRI_A)%AREA
+        AREA_B = MESH%TRIANGLES(TRI_B)%AREA
+
+        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_A, GDATA, GLOBAL_PTS_A)
+        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_B, GDATA, GLOBAL_PTS_B)
+
+        DO I = 1, GDATA%N_POINTS ! i代表源点
+            DO J = 1, GDATA%N_POINTS
+                G = GREEN_FUNC_SMOOTH(GLOBAL_PTS_A(:, I), GLOBAL_PTS_B(:, J), K)
+
+                I1 = I1 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G  ! 先不乘面积，循环结束后统一乘面积
+                I2 = I2 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_B(:, J) * G
+                I3 = I3 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_A(:, I) * G
+                I4 = I4 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * &
+                        DOT_PRODUCT(GLOBAL_PTS_A(:, I), GLOBAL_PTS_B(:, J)) * G
+                
+            END DO
+        END DO
+
+        I1 = I1 * AREA_A * AREA_B
+        I2 = I2 * AREA_A * AREA_B
+        I3 = I3 * AREA_A * AREA_B
+        I4 = I4 * AREA_A * AREA_B
+
+    END SUBROUTINE
+
     ! 计算标量格林函数的梯度
     SUBROUTINE GARD_GREEN_FUNC(R, RP, K, GRAD_G)
         REAL, INTENT(IN) :: R(3) ! 场点坐标
@@ -124,8 +171,9 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! 实现奇异性提取后的光滑核函数，用于同一三角形上的数值积分
-    COMPLEX FUNCTION GREEN_FUNC_SMOOTH2(R, RP, K) RESULT(G)
+    ! 提取 1/R 后的剩余核：(e^{-jkR} - 1) / (4πR)
+    ! R=0 时极限为 -jk/(4π)，无奇异性
+    COMPLEX FUNCTION GREEN_FUNC_SMOOTH(R, RP, K) RESULT(G)
         REAL, INTENT(IN) :: R(3) ! 场点坐标
         REAL, INTENT(IN) :: RP(3) ! 源点坐标
         REAL, INTENT(IN) :: K  ! 波数
@@ -137,7 +185,7 @@ CONTAINS
             G = -(0.0, 1.0) * K / (4.0 * PI)
         ELSE
             PHASE = CEXP((0.0, -1.0) * K * DIST)
-            G = (PHASE - (1.0, 0.0) + 0.5 * K**2 * DIST**2) / (4.0 * PI * DIST)
+            G = (PHASE - (1.0, 0.0)) / (4.0 * PI * DIST)
         END IF
     END FUNCTION
 

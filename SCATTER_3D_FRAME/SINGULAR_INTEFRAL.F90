@@ -93,7 +93,6 @@ MODULE SINGULAR_INTEGRAL
         REAL :: H_I ! 场点到边的垂直距离(有符号距离)
         REAL :: S_START, S_END ! 场点到边的起点和终点的投影长度(有符号)
         REAL :: R_START, R_END ! 场点到边的起点和终点的距离
-        REAL :: CONTRIB     ! 当前边的积分贡献
         REAL :: V_OPP(3) ! 当前边的对边顶点坐标 
         REAL :: DOT_CHECK ! 验证内法向是否指向内部的点积
         REAL :: LOG_TERM ! 对数项
@@ -166,10 +165,5 @@ MODULE SINGULAR_INTEGRAL
         END DO
 
     END SUBROUTINE ANALYTIC_LINEAR_POT_1_OVER_R
-
-
-
-
-
 
 END MODULE SINGULAR_INTEGRAL
