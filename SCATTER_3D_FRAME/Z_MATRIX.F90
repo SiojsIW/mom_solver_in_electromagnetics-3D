@@ -3,6 +3,7 @@ MODULE Z_MATRIX
     USE NUMERICAL_INTEGRATION
     USE GREEN_FUNCTIONS
     USE RWG_BASIS_BUILD
+    USE SINGULAR_INTEGRAL
     IMPLICIT NONE
 CONTAINS
 
@@ -237,5 +238,122 @@ CONTAINS
         IF (ABS(ABS(DOT_G)) > TOL_DIST) IS_COPLANAR = .FALSE.
 
     END FUNCTION
+
+    ! 计算单个三角形T对自身的完整 EFIE 阻抗贡献。
+    SUBROUTINE CALC_EFIE_SELF_TRI_PAIR(MESH, TRI_ID, RWG, GDATA, K, ETA0, Z_PAIR)
+        TYPE(MESH_3D), INTENT(IN) :: MESH
+        TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
+        INTEGER, INTENT(IN) :: TRI_ID  
+        TYPE(RWG_BASIS), INTENT(IN) :: RWG
+        REAL, INTENT(IN) :: ETA0 ! 自由空间波阻抗
+        REAL, INTENT(IN) :: K    ! 波数
+        COMPLEX, INTENT(OUT) :: Z_PAIR
+
+        REAL :: C   ! RWG基函数系数
+        REAL :: R_OPP(3) ! 对顶点坐标
+        REAL :: AREA ! 三角形面积
+        COMPLEX :: JW_MU, J_OVER_WE
+        COMPLEX :: P_SING     ! P算子1/R解析部分
+        COMPLEX :: Q_SING     ! Q算子1/R解析部分
+        COMPLEX :: P_SMOOTH2  ! P算子G_smooth2数值部分
+        COMPLEX :: Q_SMOOTH2  ! Q算子G_smooth2数值部分
+        REAL :: I0_VAL   ! 当前场点的标量势
+        REAL :: I1_VAL, I2_VAL, I3_VAL  ! 当前场点的线性势
+        REAL :: IVEC_VAL(3) ! 当前场点的矢量势
+        REAL :: SUM_I0   ! 外层高斯累计∑wi * I0_VAL
+        REAL :: SUM_R_I0(3)   ! 外层高斯累计∑wi * ri * I0_VAL
+        REAL :: SUM_IVEC(3)   ! 外层高斯累计∑wi * IVEC_VAL
+        REAL :: SUM_R_DOT_IVEC   ! 外层高斯累计∑wi * ri * (IVEC_VAL · ri)
+        REAL :: J0  ! SUM_I0 * AREA
+        REAL :: J_R_I0(3)   ! SUM_R_I0 * AREA
+        REAL :: J_VEC(3)   ! SUM_IVEC * AREA
+        REAL :: J_R_DOT   ! SUM_R_DOT_IVEC * AREA
+        INTEGER :: I
+        REAL :: R_VEC(3) ! 当前高斯点
+        REAL :: V1(3), V2(3), V3(3) ! 三角形TRI_ID的顶点坐标
+        REAL :: RESULT_3(3) ! 线性势结果
+        REAL :: TERM1, TERM2, TERM3, TERM4
+        COMPLEX :: I1 ! 标量
+        COMPLEX :: I4 ! 标量
+        COMPLEX :: I2(3) ! 矢量
+        COMPLEX :: I3(3) ! 矢量
+
+        ! 提取RWG参数
+        IF (TRI_ID == RWG%POS_TRI_ID) THEN
+            C = RWG%POS_COEF
+            R_OPP(1) = MESH%NODES(RWG%POS_OPP_VERTEX)%X
+            R_OPP(2) = MESH%NODES(RWG%POS_OPP_VERTEX)%Y
+            R_OPP(3) = MESH%NODES(RWG%POS_OPP_VERTEX)%Z
+        ELSE IF (TRI_ID == RWG%NEG_TRI_ID) THEN
+            C = -RWG%NEG_COEF
+            R_OPP(1) = MESH%NODES(RWG%NEG_OPP_VERTEX)%X
+            R_OPP(2) = MESH%NODES(RWG%NEG_OPP_VERTEX)%Y
+            R_OPP(3) = MESH%NODES(RWG%NEG_OPP_VERTEX)%Z
+        END IF
+
+        ! 预计算常数
+        JW_MU = (0.0, 1.0) * ETA0 * K
+        J_OVER_WE = (0.0, 1.0) * ETA0 / K
+
+        ! 外层高斯积分（解析部分）
+        SUM_I0 = 0.0
+        SUM_R_I0 = 0.0
+        SUM_IVEC = 0.0
+        SUM_R_DOT_IVEC = 0.0
+        CALL INIT_GAUSS_TRI_DATA(GAUSS_7PT, GDATA) ! 初始化高斯积分数据
+        DO I = 1, GDATA%N_POINTS
+            CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_ID, GDATA, R_VEC) ! 获取当前高斯点的全局坐标
+            ! 三角形TRI_ID的三个顶点
+            V1(1) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(1))%X
+            V1(2) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(1))%Y
+            V1(3) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(1))%Z
+            V2(1) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(2))%X
+            V2(2) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(2))%Y
+            V2(3) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(2))%Z
+            V3(1) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(3))%X
+            V3(2) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(3))%Y
+            V3(3) = MESH%NODES(MESH%TRIANGLES(TRI_ID)%VERTEX_3D(3))%Z
+
+            CALL ANALYTIC_SCALAR_POT_1_OVER_R(R_VEC, V1, V2, V3, I0_VAL) ! 计算标量势
+            CALL ANALYTIC_LINEAR_POT_1_OVER_R(R_VEC, V1, V2, V3, RESULT_3) ! 计算线性势
+            I1_VAL = RESULT_3(1)
+            I2_VAL = RESULT_3(2)
+            I3_VAL = RESULT_3(3)
+            
+            ! 计算矢量势 IVEC_VAL = I1_VAL * V1 + I2_VAL * V2 + I3_VAL * V3
+            IVEC_VAL(1) = V1(1) * I1_VAL + V2(1) * I2_VAL + V3(1) * I3_VAL
+            IVEC_VAL(2) = V1(2) * I1_VAL + V2(2) * I2_VAL + V3(2) * I3_VAL
+            IVEC_VAL(3) = V1(3) * I1_VAL + V2(3) * I2_VAL + V3(3) * I3_VAL
+
+            ! 累加外层高斯积分
+            SUM_I0 = SUM_I0 + GDATA%WEIGHTS(I) * I0_VAL
+            SUM_R_I0 = SUM_R_I0 + GDATA%WEIGHTS(I) * R_VEC * I0_VAL
+            SUM_IVEC = SUM_IVEC + GDATA%WEIGHTS(I) * IVEC_VAL
+            SUM_R_DOT_IVEC = SUM_R_DOT_IVEC + GDATA%WEIGHTS(I) * DOT_PRODUCT(R_VEC, IVEC_VAL)
+
+            J0 = SUM_I0 * MESH%TRIANGLES(TRI_ID)%AREA
+            J_R_I0 = SUM_R_I0 * MESH%TRIANGLES(TRI_ID)%AREA
+            J_VEC = SUM_IVEC * MESH%TRIANGLES(TRI_ID)%AREA
+            J_R_DOT = SUM_R_DOT_IVEC * MESH%TRIANGLES(TRI_ID)%AREA   
+            
+        END DO
+
+        ! 计算解析部分的Q算子
+        Q_SING = -C**2 * J0 / PI
+        ! 计算解析部分的P算子
+        TERM1 = J_R_DOT
+        TERM2 = -DOT_PRODUCT(R_OPP, J_R_I0)
+        TERM3 = -DOT_PRODUCT(R_OPP, J_VEC)
+        TERM4 = DOT_PRODUCT(R_OPP, R_OPP) * J0
+        P_SING = C**2 * (TERM1 + TERM2 + TERM3 + TERM4) / (4.0 * PI)
+
+        ! G_SMOOTH数值部分，使用G_SMOOTH
+        CALL CALC_GREEN_SMOOTH_INTEGALS(MESH, TRI_ID, TRI_ID, GDATA, K, I1, I2, I3, I4)
+        P_SMOOTH2 = C**2 * (DOT_PRODUCT(R_OPP, R_OPP) * I1 - DOT_PRODUCT(R_OPP, I2) - DOT_PRODUCT(R_OPP, I3) + I4)
+        Q_SMOOTH2 = -4.0 * C**2 * I1
+
+        Z_PAIR = JW_MU * (P_SING + P_SMOOTH2) + J_OVER_WE * (Q_SING + Q_SMOOTH2)
+
+    END SUBROUTINE
 
 END MODULE
