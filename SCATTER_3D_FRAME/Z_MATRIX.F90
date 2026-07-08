@@ -354,7 +354,8 @@ CONTAINS
 
         Z_PAIR = JW_MU * (P_SING + P_SMOOTH2) + J_OVER_WE * (Q_SING + Q_SMOOTH2)
 
-        
+
     END SUBROUTINE
 
+    
 END MODULE
