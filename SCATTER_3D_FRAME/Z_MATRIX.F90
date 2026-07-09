@@ -251,7 +251,6 @@ CONTAINS
 
         REAL :: C   ! RWG基函数系数
         REAL :: R_OPP(3) ! 对顶点坐标
-        REAL :: AREA ! 三角形面积
         COMPLEX :: JW_MU, J_OVER_WE
         COMPLEX :: P_SING     ! P算子1/R解析部分
         COMPLEX :: Q_SING     ! Q算子1/R解析部分
@@ -354,8 +353,62 @@ CONTAINS
 
         Z_PAIR = JW_MU * (P_SING + P_SMOOTH2) + J_OVER_WE * (Q_SING + Q_SMOOTH2)
 
+    END SUBROUTINE
+
+    ! 计算相邻三角形（共享一条边，正三角形与负三角形）之间的EFIE阻抗（共享一条边，弱奇异，用7点高斯求积）
+    SUBROUTINE CALC_EFIE_ADJACENT_TRI_PAIR(MESH, RWG, GDATA, K, ETA0, Z_PAIR)
+        TYPE(MESH_3D), INTENT(IN) :: MESH
+        TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
+        TYPE(RWG_BASIS), INTENT(IN) :: RWG
+        REAL, INTENT(IN) :: ETA0 ! 自由空间波阻抗
+        REAL, INTENT(IN) :: K    ! 波数
+        COMPLEX, INTENT(OUT) :: Z_PAIR
+        
+        REAL :: C_POS, C_NEG
+        REAL :: R_OPP_POS(3), R_OPP_NEG(3)
+        INTEGER :: I  ! 循环变量
+        COMPLEX :: I1 ! 标量
+        COMPLEX :: I4 ! 标量
+        COMPLEX :: I2(3) ! 矢量
+        COMPLEX :: I3(3) ! 矢量
+        COMPLEX :: Z_PPN, Z_PNP ! P算子正负三角形，负正三角形矩阵元素
+        COMPLEX :: Z_QPN, Z_QNP ! Q算子正负三角形，负正三角形矩阵元素
+        COMPLEX :: JW_MU, J_OVER_WE
+
+
+        C_POS = RWG%POS_COEF
+        C_NEG = -RWG%NEG_COEF
+                
+        ! 预计算常数
+        JW_MU = (0.0, 1.0) * ETA0 * K
+        J_OVER_WE = (0.0, 1.0) * ETA0 / K
+
+        R_OPP_POS(1) = MESH%NODES(RWG%POS_OPP_VERTEX)%X
+        R_OPP_POS(2) = MESH%NODES(RWG%POS_OPP_VERTEX)%Y
+        R_OPP_POS(3) = MESH%NODES(RWG%POS_OPP_VERTEX)%Z
+        R_OPP_NEG(1) = MESH%NODES(RWG%NEG_OPP_VERTEX)%X
+        R_OPP_NEG(2) = MESH%NODES(RWG%NEG_OPP_VERTEX)%Y
+        R_OPP_NEG(3) = MESH%NODES(RWG%NEG_OPP_VERTEX)%Z        
+
+        Z_PPN = (0.0, 0.0)  ! 正三角形（源）与负三角形（场）(P算子)
+        Z_PNP = (0.0, 0.0)  ! 负三角形（源）与正三角形（场）(P算子)
+        Z_QPN = (0.0, 0.0)  ! 正三角形（源）与负三角形（场）(Q算子)
+        Z_QNP = (0.0, 0.0)  ! 负三角形（源）与正三角形（场）(Q算子)
+
+        CALL INIT_GAUSS_TRI_DATA(GAUSS_7PT, GDATA) ! 初始化高斯积分数据
+        DO I = 1, GDATA%N_POINTS
+            ! 计算正三角形与负三角形之间的EFIE阻抗矩阵元素
+            CALL CALC_GREEN_INTEGALS(MESH, RWG%POS_TRI_ID, RWG%NEG_TRI_ID, GDATA, K, I1, I2, I3, I4)
+            Z_PPN = Z_PPN + (DOT_PRODUCT(R_OPP_POS, R_OPP_NEG) * I1 - DOT_PRODUCT(R_OPP_NEG, I2) - DOT_PRODUCT(R_OPP_POS, I3) + I4)
+            Z_QPN = Z_QPN + (-4.0 * I1) 
+            ! 计算负三角形与正三角形之间的EFIE阻抗矩阵元素
+            CALL CALC_GREEN_INTEGALS(MESH, RWG%NEG_TRI_ID, RWG%POS_TRI_ID, GDATA, K, I1, I2, I3, I4)
+            Z_PNP = Z_PNP + (DOT_PRODUCT(R_OPP_NEG, R_OPP_POS) * I1 - DOT_PRODUCT(R_OPP_POS, I2) - DOT_PRODUCT(R_OPP_NEG, I3) + I4)
+            Z_QNP = Z_QNP + (-4.0 * I1)
+        END DO
+        Z_PAIR = JW_MU * (C_POS * C_NEG * Z_PPN + C_NEG * C_POS * Z_PNP) + J_OVER_WE * (C_POS * C_NEG * Z_QPN + C_NEG * C_POS * Z_QNP)
 
     END SUBROUTINE
 
-    
+
 END MODULE
