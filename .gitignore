@@ -5,3 +5,6 @@
 *.exe
 *.zip
 Release/
+
+# Not part of this project
+CFIE/
