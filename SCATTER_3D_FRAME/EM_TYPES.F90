@@ -7,45 +7,45 @@ MODULE EM_TYPES
     END TYPE
 
     TYPE TRIANGLE_3D
-        INTEGER :: VERTEX_3D(3) = 0  ! Èý¸ö½Úµã±àºÅ
+        INTEGER :: VERTEX_3D(3) = 0  ! ä¸‰ä¸ªèŠ‚ç‚¹ç¼–å·
         REAL :: AREA = 0.0
-        REAL :: NORMAL(3) = 0.0  ! µ¥Î»Íâ·¨ÏòÏòÁ¿
-        REAL :: CENTROID(3) = 0.0    ! (ÖØÐÄ/ÐÎÐÄ)
+        REAL :: NORMAL(3) = 0.0  ! å•ä½å¤–æ³•å‘å‘é‡
+        REAL :: CENTROID(3) = 0.0    ! (é‡å¿ƒ/å½¢å¿ƒ)
     END TYPE
 
     TYPE EDGE_3D
-        INTEGER :: V1_ID = 0, V2_ID = 0  ! Ç¿ÖÆ V1_ID < V2_ID
+        INTEGER :: V1_ID = 0, V2_ID = 0  ! å¼ºåˆ¶ V1_ID < V2_ID
         REAL :: LENGTH = 0.0
         REAL :: MIDPOINT(3) = 0.0
-        INTEGER :: NUMBER_SHARED_TPI = 0  ! ¹²Ïí¸Ã±ßµÄÈý½ÇÐÎÊýÁ¿
-        INTEGER :: SHARED_TRI_IDS(2) = 0  ! ¹²Ïí¸Ã±ßµÄÈý½ÇÐÎµÄÈ«¾Ö±àºÅ
-        INTEGER :: LOCAL_EDGE_IDX(2) = 0  ! ¸Ã±ßÔÚ¶ÔÓ¦Èý½ÇÐÎÖÐµÄ¾Ö²¿±àºÅ£¨1,2,3£©
+        INTEGER :: NUMBER_SHARED_TPI = 0  ! å…±äº«è¯¥è¾¹çš„ä¸‰è§’å½¢æ•°é‡
+        INTEGER :: SHARED_TRI_IDS(2) = 0  ! å…±äº«è¯¥è¾¹çš„ä¸‰è§’å½¢çš„å…¨å±€ç¼–å·
+        INTEGER :: LOCAL_EDGE_IDX(2) = 0  ! è¯¥è¾¹åœ¨å¯¹åº”ä¸‰è§’å½¢ä¸­çš„å±€éƒ¨ç¼–å·ï¼ˆ1,2,3ï¼‰
     END TYPE
 
     TYPE RWG_BASIS 
-        INTEGER :: EDGE_ID = 0 ! ËùÊô¹«¹²±ß±àºÅ
-        INTEGER :: POS_TRI_ID = 0 ! ÕýÈý½ÇÐÎ±àºÅ
-        INTEGER :: NEG_TRI_ID = 0 ! ¸ºÈý½ÇÐÎ±àºÅ
-        INTEGER :: POS_OPP_VERTEX = 0 ! ÕýÈý½ÇÐÎ¶Ô¶¥µã±àºÅ
+        INTEGER :: EDGE_ID = 0 ! æ‰€å±žå…¬å…±è¾¹ç¼–å·
+        INTEGER :: POS_TRI_ID = 0 ! æ­£ä¸‰è§’å½¢ç¼–å·
+        INTEGER :: NEG_TRI_ID = 0 ! è´Ÿä¸‰è§’å½¢ç¼–å·
+        INTEGER :: POS_OPP_VERTEX = 0 ! æ­£ä¸‰è§’å½¢å¯¹é¡¶ç‚¹ç¼–å·
         INTEGER :: NEG_OPP_VERTEX = 0
-        REAL :: LENGTH = 0.0  ! ¹«¹²±ß³¤¶È
-        REAL :: POS_COEF = 0.0  ! ÕýÈý½ÇÐÎf£¨r£©µÄÏµÊý£¬Ln/2*An
+        REAL :: LENGTH = 0.0  ! å…¬å…±è¾¹é•¿åº¦
+        REAL :: POS_COEF = 0.0  ! æ­£ä¸‰è§’å½¢fï¼ˆrï¼‰çš„ç³»æ•°ï¼ŒLn/2*An
         REAL :: NEG_COEF = 0.0
     END TYPE
 
     TYPE MESH_3D
         INTEGER :: NUM_NODE = 0, NUM_TRIANGLE = 0, NUM_EDGE = 0
-        INTEGER :: RWG_NUM = 0  ! ¹«¹²±ßÊýÁ¿
+        INTEGER :: RWG_NUM = 0  ! å…¬å…±è¾¹æ•°é‡
         TYPE(NODE_3D), ALLOCATABLE :: NODES(:)
         TYPE(TRIANGLE_3D), ALLOCATABLE :: TRIANGLES(:)
         TYPE(EDGE_3D), ALLOCATABLE :: EDGES(:)
         TYPE(RWG_BASIS), ALLOCATABLE :: RWG_BASES(:)
     END TYPE
 
-    INTEGER, PARAMETER :: GAUSS_1PT = 1, GAUSS_3PT = 3, GAUSS_4PT = 4, GAUSS_7PT = 7, GAUSS_12PT = 12
+    INTEGER, PARAMETER :: GAUSS_1PT = 1, GAUSS_3PT = 3, GAUSS_4PT = 4, GAUSS_7PT = 7, GAUSS_12PT = 12, GAUSS_25PT = 25
     REAL, PARAMETER :: PI = 4.0 * ATAN(1.0)
 
-    ! ¶¨Òå¸ßË¹»ý·ÖÊý¾Ý£¨¼¸µã»ý·Ö£¬Ãæ»ý×ø±ê£¬È¨ÖØ£©
+    ! å®šä¹‰é«˜æ–¯ç§¯åˆ†æ•°æ®ï¼ˆå‡ ç‚¹ç§¯åˆ†ï¼Œé¢ç§¯åæ ‡ï¼Œæƒé‡ï¼‰
     TYPE GAUSS_TRI_DATA
         INTEGER :: N_POINTS = 0
         REAL, ALLOCATABLE :: UVW(:, :)

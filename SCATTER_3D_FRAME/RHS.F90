@@ -4,9 +4,9 @@ MODULE RHS
     IMPLICIT NONE
 CONTAINS
 
-    ! Æ½Ãæ²¨³¡¼ÆËã×Ó³ÌÐò£¬¸ø¶¨¿Õ¼äÒ»µãr£¬¼ÆËã¸ÃµãµÄEiºÍHi
+    ! å¹³é¢æ³¢åœºè®¡ç®—å­ç¨‹åºï¼Œç»™å®šç©ºé—´ä¸€ç‚¹rï¼Œè®¡ç®—è¯¥ç‚¹çš„Eiå’ŒHi
     SUBROUTINE CALC_PLANE_WAVE(R_PT, K, K_HAT, E_POL, E0, ETA0, E_INC, H_INC)
-        REAL, INTENT(IN) :: R_PT(3) ! ³¡µã×ø±êr
+        REAL, INTENT(IN) :: R_PT(3) ! åœºç‚¹åæ ‡r
         REAL, INTENT(IN) :: K
         REAL, INTENT(IN) :: K_HAT(3)
         REAL, INTENT(IN) :: E_POL(3)
@@ -31,7 +31,7 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! ¶Ôµ¥¸öRWG»ùº¯Êýfm£¬¼ÆËãV_m(E)
+    ! å¯¹å•ä¸ªRWGåŸºå‡½æ•°fmï¼Œè®¡ç®—V_m(E)
     SUBROUTINE CALC_EFIE_RHS(MESH, RWG, GDATA, K, K_HAT, E_POL, E0, ETA0, V_M_E)
         TYPE(MESH_3D), intent(IN) :: MESH
         TYPE(RWG_BASIS), INTENT(IN) :: RWG
@@ -68,7 +68,7 @@ CONTAINS
         DO M = 1, 2
             A_M = MESH%TRIANGLES(TRI_M(M))%AREA
             CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_M(M), GDATA, GLOBAL_PTS_M)
-            V_LOCAL = (0.0, 0.0) ! ¾Ö²¿ÀÛ¼Ó£¬¸ôÀëµ±Ç°Èý½ÇÐÎ
+            V_LOCAL = (0.0, 0.0) ! å±€éƒ¨ç´¯åŠ ï¼Œéš”ç¦»å½“å‰ä¸‰è§’å½¢
             DO I = 1, GDATA%N_POINTS
                 R_PT = GLOBAL_PTS_M(:, I)
                 CALL CALC_PLANE_WAVE(R_PT, K, K_HAT, E_POL, E0, ETA0, E_INC, H_INC)
@@ -80,7 +80,7 @@ CONTAINS
         END DO
     END SUBROUTINE
 
-    ! ¼ÆËãÓÒ¶ËÏîV_m(M)
+    ! è®¡ç®—å³ç«¯é¡¹V_m(M)
     SUBROUTINE CALC_MFIE_RHS(MESH, RWG, GDATA, K, K_HAT, E_POL, E0, ETA0, V_M_M)
         TYPE(MESH_3D), intent(IN) :: MESH
         TYPE(RWG_BASIS), INTENT(IN) :: RWG

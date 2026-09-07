@@ -1,0 +1,20 @@
+SetFactory("OpenCASCADE");
+
+R  = 1.0;
+ka = 3.0;
+h  = 2*Pi*R/ka / 10;
+
+Sphere(1) = {0, 0, 0, R};
+
+// 关键：删除体，只保留外表面
+Delete { Volume{1}; }
+
+// 对表面所有顶点强制网格尺寸
+Characteristic Length { PointsOf{ Surface{1}; } } = h;
+
+// 改善三角形质量
+Mesh.Algorithm = 6;
+Mesh.Smoothing = 3;
+
+// 生成 2D 表面网格
+Mesh 2;

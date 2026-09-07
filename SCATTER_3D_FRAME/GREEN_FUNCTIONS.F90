@@ -4,15 +4,15 @@ MODULE GREEN_FUNCTIONS
     IMPLICIT NONE
 CONTAINS
 
-    ! ¼ÆËã¸ñÁÖº¯Êý£¬ÊäÈëÁ½¸ö×ø±ê£¬¼ÆËãÁ½¸ö×ø±êµãµÄ¸ñÁÖº¯Êý
+    ! è®¡ç®—æ ¼æž—å‡½æ•°ï¼Œè¾“å…¥ä¸¤ä¸ªåæ ‡ï¼Œè®¡ç®—ä¸¤ä¸ªåæ ‡ç‚¹çš„æ ¼æž—å‡½æ•°
     COMPLEX FUNCTION GREEN_FUNC(R, RP, K) RESULT(G)
-        REAL, INTENT(IN):: R(3) ! Ô´µã×ø±ê
-        REAL, INTENT(IN):: RP(3) ! ³¡µã×ø±ê
-        REAL,INTENT(IN) :: K  ! ²¨Êý
+        REAL, INTENT(IN):: R(3) ! æºç‚¹åæ ‡
+        REAL, INTENT(IN):: RP(3) ! åœºç‚¹åæ ‡
+        REAL,INTENT(IN) :: K  ! æ³¢æ•°
         REAL :: DIST
         
-        ! COMPLEX ÀàÐÍ£¬ÐéÊýµ¥Î»ÊÇ (0.0, 1.0)¡£CEXP ÊÇ¸´ÊýÖ¸Êý¡£PI = 4.0*ATAN(1.0)¡£
-        DIST = SQRT(SUM((R - RP) ** 2)) ! ³¡µãÓëÔ´µã¾àÀë
+        ! COMPLEX ç±»åž‹ï¼Œè™šæ•°å•ä½æ˜¯ (0.0, 1.0)ã€‚CEXP æ˜¯å¤æ•°æŒ‡æ•°ã€‚PI = 4.0*ATAN(1.0)ã€‚
+        DIST = SQRT(SUM((R - RP) ** 2)) ! åœºç‚¹ä¸Žæºç‚¹è·ç¦»
 
         IF (DIST < 1.0E-10) THEN
             G = (0.0, 0.0)
@@ -21,27 +21,27 @@ CONTAINS
         END IF
     END FUNCTION
 
-    ! ¼ÆËã×è¿¹ÔªËØZ_MN£¬Ö»ÊÇ¼ÆËã¸ñÁÖº¯ÊýÔÚÁ½¸öÈý½ÇÐÎÉÏµÄ£¬Ã»ÓÐf¡£
+    ! è®¡ç®—é˜»æŠ—å…ƒç´ Z_MNï¼Œåªæ˜¯è®¡ç®—æ ¼æž—å‡½æ•°åœ¨ä¸¤ä¸ªä¸‰è§’å½¢ä¸Šçš„ï¼Œæ²¡æœ‰fã€‚
     SUBROUTINE CALC_GREEN_MATRIX_ELEMENT(MESH, TM_ID, TN_ID, GDATA, K, Z_MN)
         TYPE(MESH_3D), INTENT(IN) :: MESH
         TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
-        INTEGER :: TM_ID ! ³¡Èý½ÇÐÎ±àºÅ
-        INTEGER :: TN_ID ! Ô´Èý½ÇÐÎ±àºÅ
+        INTEGER :: TM_ID ! åœºä¸‰è§’å½¢ç¼–å·
+        INTEGER :: TN_ID ! æºä¸‰è§’å½¢ç¼–å·
         INTEGER :: I, J
-        REAL :: K  ! ²¨Êý
-        REAL, ALLOCATABLE :: GLOBAL_PTS_M(:, :) ! ³¡Èý½ÇÐÎ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
-        REAL, ALLOCATABLE :: GLOBAL_PTS_N(:, :) ! Ô´Èý½ÇÐÎ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
+        REAL :: K  ! æ³¢æ•°
+        REAL, ALLOCATABLE :: GLOBAL_PTS_M(:, :) ! åœºä¸‰è§’å½¢é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
+        REAL, ALLOCATABLE :: GLOBAL_PTS_N(:, :) ! æºä¸‰è§’å½¢é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
         COMPLEX :: G
         COMPLEX, INTENT(OUT) :: Z_MN 
 
         ALLOCATE(GLOBAL_PTS_M(3, GDATA%N_POINTS)) 
         ALLOCATE(GLOBAL_PTS_N(3, GDATA%N_POINTS)) 
-        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TM_ID, GDATA, GLOBAL_PTS_M)  ! µÃµ½³¡Èý½ÇÐÎµÄ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
-        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TN_ID, GDATA, GLOBAL_PTS_N)  ! µÃµ½Ô´Èý½ÇÐÎµÄ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
+        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TM_ID, GDATA, GLOBAL_PTS_M)  ! å¾—åˆ°åœºä¸‰è§’å½¢çš„é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
+        CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TN_ID, GDATA, GLOBAL_PTS_N)  ! å¾—åˆ°æºä¸‰è§’å½¢çš„é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
 
         Z_MN = (0.0, 0.0)
-        DO I = 1, GDATA%N_POINTS ! ³¡
-            DO J = 1, GDATA%N_POINTS ! Ô´
+        DO I = 1, GDATA%N_POINTS ! åœº
+            DO J = 1, GDATA%N_POINTS ! æº
                 G = GREEN_FUNC(GLOBAL_PTS_M(:, I), GLOBAL_PTS_N(:, J), K) 
                 Z_MN = Z_MN + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G
             END DO
@@ -54,25 +54,25 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! ¼ÆËãÒ»¸öÈý½ÇÐÎ¶ÔÉÏµÄËÄ¸ö»ý·ÖI1,I2,I3,I4£¬£¨¼ÆËãEFIE·Ç¶Ô½Ç¾ØÕóÔªËØÓÃ£©
+    ! è®¡ç®—ä¸€ä¸ªä¸‰è§’å½¢å¯¹ä¸Šçš„å››ä¸ªç§¯åˆ†I1,I2,I3,I4ï¼Œï¼ˆè®¡ç®—EFIEéžå¯¹è§’çŸ©é˜µå…ƒç´ ç”¨ï¼‰
     SUBROUTINE CALC_GREEN_INTEGALS(MESH, TRI_A, TRI_B, GDATA, K, I1, I2, I3, I4)
         TYPE(MESH_3D), INTENT(IN) :: MESH
         TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
-        INTEGER, INTENT(IN) :: TRI_A ! Ô´Èý½ÇÐÎ
-        INTEGER, INTENT(IN) :: TRI_B ! ³¡Èý½ÇÐÎ
-        REAL, INTENT(IN) :: K  ! ²¨Êý
-        COMPLEX, INTENT(OUT) :: I1 ! ±êÁ¿
-        COMPLEX, INTENT(OUT) :: I4 ! ±êÁ¿
-        COMPLEX, INTENT(OUT) :: I2(3) ! Ê¸Á¿
-        COMPLEX, INTENT(OUT) :: I3(3) ! Ê¸Á¿
+        INTEGER, INTENT(IN) :: TRI_A ! æºä¸‰è§’å½¢
+        INTEGER, INTENT(IN) :: TRI_B ! åœºä¸‰è§’å½¢
+        REAL, INTENT(IN) :: K  ! æ³¢æ•°
+        COMPLEX, INTENT(OUT) :: I1 ! æ ‡é‡
+        COMPLEX, INTENT(OUT) :: I4 ! æ ‡é‡
+        COMPLEX, INTENT(OUT) :: I2(3) ! çŸ¢é‡
+        COMPLEX, INTENT(OUT) :: I3(3) ! çŸ¢é‡
     
         REAL :: AREA_A, AREA_B
-        REAL :: GLOBAL_PTS_A(3, GDATA%N_POINTS), GLOBAL_PTS_B(3, GDATA%N_POINTS) ! Èý½ÇÐÎ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
+        REAL :: GLOBAL_PTS_A(3, GDATA%N_POINTS), GLOBAL_PTS_B(3, GDATA%N_POINTS) ! ä¸‰è§’å½¢é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
         INTEGER :: I, J
         COMPLEX :: G
         I1 = (0.0, 0.0)
         I4 = (0.0, 0.0)
-        I2 = (0.0, 0.0)   ! ±êÁ¿¸´Êý×Ô¶¯¹ã²¥µ½3¸öÔªËØ
+        I2 = (0.0, 0.0)   ! æ ‡é‡å¤æ•°è‡ªåŠ¨å¹¿æ’­åˆ°3ä¸ªå…ƒç´ 
         I3 = (0.0, 0.0)
 
         AREA_A = MESH%TRIANGLES(TRI_A)%AREA
@@ -81,11 +81,11 @@ CONTAINS
         CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_A, GDATA, GLOBAL_PTS_A)
         CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_B, GDATA, GLOBAL_PTS_B)
 
-        DO I = 1, GDATA%N_POINTS ! i´ú±íÔ´µã
+        DO I = 1, GDATA%N_POINTS ! iä»£è¡¨æºç‚¹
             DO J = 1, GDATA%N_POINTS
                 G = GREEN_FUNC(GLOBAL_PTS_A(:, I), GLOBAL_PTS_B(:, J), K)
 
-                I1 = I1 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G  ! ÏÈ²»³ËÃæ»ý£¬Ñ­»·½áÊøºóÍ³Ò»³ËÃæ»ý
+                I1 = I1 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G  ! å…ˆä¸ä¹˜é¢ç§¯ï¼Œå¾ªçŽ¯ç»“æŸåŽç»Ÿä¸€ä¹˜é¢ç§¯
                 I2 = I2 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_B(:, J) * G
                 I3 = I3 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_A(:, I) * G
                 I4 = I4 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * &
@@ -101,25 +101,25 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! ¼ÆËãÒ»¸öÈý½ÇÐÎ¶ÔÉÏµÄËÄ¸ö»ý·ÖI1,I2,I3,I4£¬£¨¼ÆËãEFIE¶Ô½Ç¾ØÕóÔªËØÓÃ£¬G_SMOOTH£©
+    ! è®¡ç®—ä¸€ä¸ªä¸‰è§’å½¢å¯¹ä¸Šçš„å››ä¸ªç§¯åˆ†I1,I2,I3,I4ï¼Œï¼ˆè®¡ç®—EFIEå¯¹è§’çŸ©é˜µå…ƒç´ ç”¨ï¼ŒG_SMOOTHï¼‰
     SUBROUTINE CALC_GREEN_SMOOTH_INTEGALS(MESH, TRI_A, TRI_B, GDATA, K, I1, I2, I3, I4)
         TYPE(MESH_3D), INTENT(IN) :: MESH
         TYPE(GAUSS_TRI_DATA), INTENT(IN) :: GDATA
-        INTEGER, INTENT(IN) :: TRI_A ! Ô´Èý½ÇÐÎ
-        INTEGER, INTENT(IN) :: TRI_B ! ³¡Èý½ÇÐÎ
-        REAL, INTENT(IN) :: K  ! ²¨Êý
-        COMPLEX, INTENT(OUT) :: I1 ! ±êÁ¿
-        COMPLEX, INTENT(OUT) :: I4 ! ±êÁ¿
-        COMPLEX, INTENT(OUT) :: I2(3) ! Ê¸Á¿
-        COMPLEX, INTENT(OUT) :: I3(3) ! Ê¸Á¿
+        INTEGER, INTENT(IN) :: TRI_A ! æºä¸‰è§’å½¢
+        INTEGER, INTENT(IN) :: TRI_B ! åœºä¸‰è§’å½¢
+        REAL, INTENT(IN) :: K  ! æ³¢æ•°
+        COMPLEX, INTENT(OUT) :: I1 ! æ ‡é‡
+        COMPLEX, INTENT(OUT) :: I4 ! æ ‡é‡
+        COMPLEX, INTENT(OUT) :: I2(3) ! çŸ¢é‡
+        COMPLEX, INTENT(OUT) :: I3(3) ! çŸ¢é‡
     
         REAL :: AREA_A, AREA_B
-        REAL :: GLOBAL_PTS_A(3, GDATA%N_POINTS), GLOBAL_PTS_B(3, GDATA%N_POINTS) ! Èý½ÇÐÎ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
+        REAL :: GLOBAL_PTS_A(3, GDATA%N_POINTS), GLOBAL_PTS_B(3, GDATA%N_POINTS) ! ä¸‰è§’å½¢é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
         INTEGER :: I, J
         COMPLEX :: G
         I1 = (0.0, 0.0)
         I4 = (0.0, 0.0)
-        I2 = (0.0, 0.0)   ! ±êÁ¿¸´Êý×Ô¶¯¹ã²¥µ½3¸öÔªËØ
+        I2 = (0.0, 0.0)   ! æ ‡é‡å¤æ•°è‡ªåŠ¨å¹¿æ’­åˆ°3ä¸ªå…ƒç´ 
         I3 = (0.0, 0.0)
 
         AREA_A = MESH%TRIANGLES(TRI_A)%AREA
@@ -128,11 +128,11 @@ CONTAINS
         CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_A, GDATA, GLOBAL_PTS_A)
         CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, TRI_B, GDATA, GLOBAL_PTS_B)
 
-        DO I = 1, GDATA%N_POINTS ! i´ú±íÔ´µã
+        DO I = 1, GDATA%N_POINTS ! iä»£è¡¨æºç‚¹
             DO J = 1, GDATA%N_POINTS
                 G = GREEN_FUNC_SMOOTH(GLOBAL_PTS_A(:, I), GLOBAL_PTS_B(:, J), K)
 
-                I1 = I1 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G  ! ÏÈ²»³ËÃæ»ý£¬Ñ­»·½áÊøºóÍ³Ò»³ËÃæ»ý
+                I1 = I1 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * G  ! å…ˆä¸ä¹˜é¢ç§¯ï¼Œå¾ªçŽ¯ç»“æŸåŽç»Ÿä¸€ä¹˜é¢ç§¯
                 I2 = I2 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_B(:, J) * G
                 I3 = I3 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * GLOBAL_PTS_A(:, I) * G
                 I4 = I4 + GDATA%WEIGHTS(I) * GDATA%WEIGHTS(J) * &
@@ -148,11 +148,11 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! ¼ÆËã±êÁ¿¸ñÁÖº¯ÊýµÄÌÝ¶È
+    ! è®¡ç®—æ ‡é‡æ ¼æž—å‡½æ•°çš„æ¢¯åº¦
     SUBROUTINE GARD_GREEN_FUNC(R, RP, K, GRAD_G)
-        REAL, INTENT(IN) :: R(3) ! ³¡µã×ø±ê
-        REAL, INTENT(IN) :: RP(3) ! Ô´µã×ø±ê
-        REAL, INTENT(IN) :: K  ! ²¨Êý
+        REAL, INTENT(IN) :: R(3) ! åœºç‚¹åæ ‡
+        REAL, INTENT(IN) :: RP(3) ! æºç‚¹åæ ‡
+        REAL, INTENT(IN) :: K  ! æ³¢æ•°
         COMPLEX, INTENT(OUT) :: GRAD_G(3)
         COMPLEX :: FACTOR
         COMPLEX :: G
@@ -171,16 +171,16 @@ CONTAINS
 
     END SUBROUTINE
 
-    ! ÌáÈ¡ 1/R ºóµÄÊ£ÓàºË£º(e^{-jkR} - 1) / (4¦ÐR)
-    ! R=0 Ê±¼«ÏÞÎª -jk/(4¦Ð)£¬ÎÞÆæÒìÐÔ
+    ! æå– 1/R åŽçš„å‰©ä½™æ ¸ï¼š(e^{-jkR} - 1) / (4Ï€R)
+    ! R=0 æ—¶æžé™ä¸º -jk/(4Ï€)ï¼Œæ— å¥‡å¼‚æ€§
     COMPLEX FUNCTION GREEN_FUNC_SMOOTH(R, RP, K) RESULT(G)
-        REAL, INTENT(IN) :: R(3) ! ³¡µã×ø±ê
-        REAL, INTENT(IN) :: RP(3) ! Ô´µã×ø±ê
-        REAL, INTENT(IN) :: K  ! ²¨Êý
+        REAL, INTENT(IN) :: R(3) ! åœºç‚¹åæ ‡
+        REAL, INTENT(IN) :: RP(3) ! æºç‚¹åæ ‡
+        REAL, INTENT(IN) :: K  ! æ³¢æ•°
         REAL :: DIST
         COMPLEX :: PHASE
 
-        DIST = SQRT(SUM((R - RP) ** 2)) ! ³¡µãÓëÔ´µã¾àÀë
+        DIST = SQRT(SUM((R - RP) ** 2)) ! åœºç‚¹ä¸Žæºç‚¹è·ç¦»
         IF (DIST < 1.0E-10) THEN
             G = -(0.0, 1.0) * K / (4.0 * PI)
         ELSE
@@ -188,6 +188,30 @@ CONTAINS
             G = (PHASE - (1.0, 0.0)) / (4.0 * PI * DIST)
         END IF
     END FUNCTION
+
+    ! MFIE ç”¨ï¼šâˆ‡G å‡åŽ»é™æ€ä¸»å€¼é¡¹åŽçš„æ­£åˆ™ä½™é¡¹
+    ! âˆ‡G_reg = âˆ‡G - âˆ‡G_static
+    !        = -R_vec/(4Ï€ R^3) * [(1+jkR)e^{-jkR} - 1]
+    ! Râ†’0 æ—¶å¼±å¥‡å¼‚ï¼Œå·²åŽ» 1/R^2 å¼ºå¥‡å¼‚æ€§
+    SUBROUTINE GRAD_GREEN_REG(R, RP, K, GRAD_REG)
+        REAL, INTENT(IN) :: R(3), RP(3), K
+        COMPLEX, INTENT(OUT) :: GRAD_REG(3)
+        REAL :: R_VEC(3), DIST, KR
+        COMPLEX :: PHASE_TERM
+        REAL, PARAMETER :: EPS = 1.0E-10
+
+        R_VEC = R - RP
+        DIST = SQRT(SUM(R_VEC**2))
+
+        IF (DIST < EPS) THEN
+            ! é™æ€éƒ¨åˆ†å·²è§£æžæå–ï¼Œä½™é¡¹åœ¨é‡åˆç‚¹è´¡çŒ®å¯å¿½ç•¥
+            GRAD_REG = (0.0, 0.0)
+        ELSE
+            KR = K * DIST
+            PHASE_TERM = CMPLX(1.0, KR) * CEXP((0.0, -1.0) * KR) - (1.0, 0.0)
+            GRAD_REG = -R_VEC * PHASE_TERM / (4.0 * PI * DIST**3)
+        END IF
+    END SUBROUTINE GRAD_GREEN_REG
 
 
 END MODULE

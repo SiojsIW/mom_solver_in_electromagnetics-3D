@@ -1,5 +1,7 @@
-*.obj
+# Fortran build artifacts
 *.mod
+*.o
+*.obj
 *.exe
-tasks.json
-
+*.zip
+Release/

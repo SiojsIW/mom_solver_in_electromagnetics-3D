@@ -1,8 +1,8 @@
-! £¨1£©»ùÓÚPRACTICE 8£¬ÓÅ»¯Èý¸öµØ·½£º
-!           1.¹²ÃæÊ±KËã×Ó²¿·ÖÀíÂÛÎª0£ºÌí¼ÓIS_COPLANAR_TRI_PAIR³ÌÐò£¬ÅÐ¶ÏÁ½Èý½ÇÐÎÊÇ·ñ¹²Ãæ£¬Èç¹û¹²ÃæÔòKËã×ÓÏà¹ØÏîÎª0
-!           2.1/2<fm,fn>ÔÚÁÙ±ßÊÇ²»Îª0£ºÔÚÁ½¸öRWGÖ§³ÅÓòÍêÈ«²»ÖØºÏ£¨ËÄ¸öÈý½ÇÐÎ¶¼²»ÖØºÏ£©Ê±²ÅÎª0
-!           3.Ìí¼ÓSUBROUTINE VERIFY_OUTWARD_NORMALS(MESH)¡£ÓÉÓÚÉæ¼°Íâ·½ÏòÏòÁ¿²ÎÓë¼ÆËã£¬Ó¦¸Ã¼ì²éÊÇ·ñ¶¼ÎªÍâ·¨Ïß·½Ïò¡£
-! £¨2£©CFIE×éºÏ£¨×ó¶ËÏî£©+ ÓÒ¶ËÏî
+! ï¼ˆ1ï¼‰åŸºäºŽPRACTICE 8ï¼Œä¼˜åŒ–ä¸‰ä¸ªåœ°æ–¹ï¼š
+!           1.å…±é¢æ—¶Kç®—å­éƒ¨åˆ†ç†è®ºä¸º0ï¼šæ·»åŠ IS_COPLANAR_TRI_PAIRç¨‹åºï¼Œåˆ¤æ–­ä¸¤ä¸‰è§’å½¢æ˜¯å¦å…±é¢ï¼Œå¦‚æžœå…±é¢åˆ™Kç®—å­ç›¸å…³é¡¹ä¸º0
+!           2.1/2<fm,fn>åœ¨ä¸´è¾¹æ˜¯ä¸ä¸º0ï¼šåœ¨ä¸¤ä¸ªRWGæ”¯æ’‘åŸŸå®Œå…¨ä¸é‡åˆï¼ˆå››ä¸ªä¸‰è§’å½¢éƒ½ä¸é‡åˆï¼‰æ—¶æ‰ä¸º0
+!           3.æ·»åŠ SUBROUTINE VERIFY_OUTWARD_NORMALS(MESH)ã€‚ç”±äºŽæ¶‰åŠå¤–æ–¹å‘å‘é‡å‚ä¸Žè®¡ç®—ï¼Œåº”è¯¥æ£€æŸ¥æ˜¯å¦éƒ½ä¸ºå¤–æ³•çº¿æ–¹å‘ã€‚
+! ï¼ˆ2ï¼‰CFIEç»„åˆï¼ˆå·¦ç«¯é¡¹ï¼‰+ å³ç«¯é¡¹
 ! ---------------------------------------------------------------2026/6/26---------------------
 
 PROGRAM TETRAHENDRON_MESH
@@ -16,18 +16,18 @@ PROGRAM TETRAHENDRON_MESH
     IMPLICIT NONE
     
     REAL, PARAMETER :: ETA0 = 120.0 * PI
-    INTEGER :: I, J, M, N ! ÓÃÓÚÑ­»·
-    REAL, ALLOCATABLE ::GLOBAL_PTS(:, :) ! ±ØÐëÓÃ¿É·ÖÅä´óÐ¡µÄÊý×é£¬ÒòÎªÄ¿Ç°µÚ¶þÎ¬´óÐ¡Î´Öª¡£ºóÃæÔÙ¾ßÌå·ÖÅäÄÚ´æ´óÐ¡
-    REAL :: VAL = 0.0 ! ¸ßË¹»ý·ÖÖµ
-    REAL :: LAMBDA = 1.0 ! ²¨³¤
-    REAL :: K ! ²¨Êý
-    REAL :: DIST ! Á½¸öÈý½ÇÐÎÖ®¼äµÄÅ·ÊÏ¾àÀë
-    REAL :: F_VAL_POS(3), F_VAL_NEG(3) ! Õý¸ºÈý½ÇÐÎµÄf£¨r£©µÄÖµ
-    COMPLEX :: G_APPROX  ! ÓÃ¸ñÁÖº¯Êý½üËÆ¹«Ê½¼ÆËãµÄÁ½¸öÈý½ÇÐÎZ_MN£¬ÓÃÓÚÑéÖ¤½á¹û¶Ô²»¶Ô
+    INTEGER :: I, J, M, N ! ç”¨äºŽå¾ªçŽ¯
+    REAL, ALLOCATABLE ::GLOBAL_PTS(:, :) ! å¿…é¡»ç”¨å¯åˆ†é…å¤§å°çš„æ•°ç»„ï¼Œå› ä¸ºç›®å‰ç¬¬äºŒç»´å¤§å°æœªçŸ¥ã€‚åŽé¢å†å…·ä½“åˆ†é…å†…å­˜å¤§å°
+    REAL :: VAL = 0.0 ! é«˜æ–¯ç§¯åˆ†å€¼
+    REAL :: LAMBDA = 1.0 ! æ³¢é•¿
+    REAL :: K ! æ³¢æ•°
+    REAL :: DIST ! ä¸¤ä¸ªä¸‰è§’å½¢ä¹‹é—´çš„æ¬§æ°è·ç¦»
+    REAL :: F_VAL_POS(3), F_VAL_NEG(3) ! æ­£è´Ÿä¸‰è§’å½¢çš„fï¼ˆrï¼‰çš„å€¼
+    COMPLEX :: G_APPROX  ! ç”¨æ ¼æž—å‡½æ•°è¿‘ä¼¼å…¬å¼è®¡ç®—çš„ä¸¤ä¸ªä¸‰è§’å½¢Z_MNï¼Œç”¨äºŽéªŒè¯ç»“æžœå¯¹ä¸å¯¹
     COMPLEX :: Z_MN
     COMPLEX, ALLOCATABLE :: Z_E(:, :), Z_M(:, :), Z_CFIE(:, :)
     REAL :: ALPHA
-    ! ÈëÉä²¨Æ½Ãæ²ÎÊý¶¨Òå
+    ! å…¥å°„æ³¢å¹³é¢å‚æ•°å®šä¹‰
     REAL :: K_HAT(3) = [0.0, 0.0, 1.0]
     REAL :: E_POL(3) = [1.0, 0.0, 0.0]
     REAL :: E0 = 1.0
@@ -41,13 +41,13 @@ PROGRAM TETRAHENDRON_MESH
     CALL INIT_MESH_3D(MESH, 4, 4)
     CALL INIT_GAUSS_TRI(GAUSS_3PT, GDATA)
 
-    ! Ìî³ä½Úµã£¨ÕýËÄÃæÌå¶¥µã£¬±ß³¤Îª 1£©
+    ! å¡«å……èŠ‚ç‚¹ï¼ˆæ­£å››é¢ä½“é¡¶ç‚¹ï¼Œè¾¹é•¿ä¸º 1ï¼‰
     MESH%NODES(1)%ID = 1; MESH%NODES(1)%X = 0.0; MESH%NODES(1)%Y = 0.0; MESH%NODES(1)%Z = 0.0
     MESH%NODES(2)%ID = 2; MESH%NODES(2)%X = 1.0; MESH%NODES(2)%Y = 0.0; MESH%NODES(2)%Z = 0.0
     MESH%NODES(3)%ID = 3; MESH%NODES(3)%X = 0.5; MESH%NODES(3)%Y = SQRT(3.0)/2.0; MESH%NODES(3)%Z = 0.0
     MESH%NODES(4)%ID = 4; MESH%NODES(4)%X = 0.5; MESH%NODES(4)%Y = SQRT(3.0)/6.0; MESH%NODES(4)%Z = SQRT(6.0)/3.0
 
-    ! Ìî³ä 4 ¸öÈý½ÇÐÎÃæ£¨¶¥µã±àºÅ°´ÓÒÊÖ¶¨ÔòÍâ·¨Ïò³¯Íâ£©
+    ! å¡«å…… 4 ä¸ªä¸‰è§’å½¢é¢ï¼ˆé¡¶ç‚¹ç¼–å·æŒ‰å³æ‰‹å®šåˆ™å¤–æ³•å‘æœå¤–ï¼‰
     MESH%TRIANGLES(1)%VERTEX_3D(1) = 1; MESH%TRIANGLES(1)%VERTEX_3D(2) = 3; MESH%TRIANGLES(1)%VERTEX_3D(3) = 2
     MESH%TRIANGLES(2)%VERTEX_3D(1) = 1; MESH%TRIANGLES(2)%VERTEX_3D(2) = 2; MESH%TRIANGLES(2)%VERTEX_3D(3) = 4
     MESH%TRIANGLES(3)%VERTEX_3D(1) = 2; MESH%TRIANGLES(3)%VERTEX_3D(2) = 3; MESH%TRIANGLES(3)%VERTEX_3D(3) = 4
@@ -59,107 +59,108 @@ PROGRAM TETRAHENDRON_MESH
     CALL UPDATE_EDGE_GEOMETRY(MESH)
     CALL BUILD_RWG_BASIS(MESH)
 
-    PRINT *, "×Ü±ßÊý£º", MESH%NUM_EDGE
+    PRINT *, "æ€»è¾¹æ•°ï¼š", MESH%NUM_EDGE
     
     DO I = 1, MESH%NUM_EDGE
 
-        PRINT *, "µÚ", I, "Ìõ±ßµÄµÚÒ»¸ö¶¥µãID: ", MESH%EDGES(I)%V1_ID, "µÚ", I, "Ìõ±ßµÄµÚ¶þ¸ö¶¥µãID: ", MESH%EDGES(I)%V2_ID
-        PRINT *, "µÚ", I, "Ìõ±ßµÄ³¤¶È: ", MESH%EDGES(I)%LENGTH
-        PRINT *, "¹²ÏíµÚ", I, "Ìõ±ßµÄÈý½ÇÐÎµÄ¸öÊý: ", MESH%EDGES(I)%NUMBER_SHARED_TPI
+        PRINT *, "ç¬¬", I, "æ¡è¾¹çš„ç¬¬ä¸€ä¸ªé¡¶ç‚¹ID: ", MESH%EDGES(I)%V1_ID, "ç¬¬", I, "æ¡è¾¹çš„ç¬¬äºŒä¸ªé¡¶ç‚¹ID: ", MESH%EDGES(I)%V2_ID
+        PRINT *, "ç¬¬", I, "æ¡è¾¹çš„é•¿åº¦: ", MESH%EDGES(I)%LENGTH
+        PRINT *, "å…±äº«ç¬¬", I, "æ¡è¾¹çš„ä¸‰è§’å½¢çš„ä¸ªæ•°: ", MESH%EDGES(I)%NUMBER_SHARED_TPI
 
     END DO
 
+    J = 0
     DO I = 1, MESH%NUM_EDGE
         IF (MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
             J = J + 1
         END IF
     END DO
 
-    PRINT *, "RWG±ßÊý£¨±»Á½¸öÈý½ÇÐÎ¹²ÏíµÄ£©Îª£º", J
+    PRINT *, "RWGè¾¹æ•°ï¼ˆè¢«ä¸¤ä¸ªä¸‰è§’å½¢å…±äº«çš„ï¼‰ä¸ºï¼š", J
     
     DO I = 1, MESH%NUM_EDGE
         IF (MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
-            PRINT *, "µÚ", I, "¸ö±ßÊÇ¹«¹²±ß£¬ËûÊôÓÚÕâÁ½¸öÈý½ÇÐÎ£º", &
+            PRINT *, "ç¬¬", I, "ä¸ªè¾¹æ˜¯å…¬å…±è¾¹ï¼Œä»–å±žäºŽè¿™ä¸¤ä¸ªä¸‰è§’å½¢ï¼š", &
                     MESH%EDGES(I)%SHARED_TRI_IDS(1), MESH%EDGES(I)%SHARED_TRI_IDS(2), &
-                    "ÔÚÈý½ÇÐÎÖÐµÄ¾Ö²¿±àºÅ·Ö±ðÎª£º", MESH%EDGES(I)%LOCAL_EDGE_IDX(1), MESH%EDGES(I)%LOCAL_EDGE_IDX(2)
+                    "åœ¨ä¸‰è§’å½¢ä¸­çš„å±€éƒ¨ç¼–å·åˆ†åˆ«ä¸ºï¼š", MESH%EDGES(I)%LOCAL_EDGE_IDX(1), MESH%EDGES(I)%LOCAL_EDGE_IDX(2)
         END IF
     END DO
 
     DO I = 1, MESH%NUM_TRIANGLE
-        PRINT *, "Èý½ÇÐÎ", I, "Ãæ»ý£º", MESH%TRIANGLES(I)%AREA
-        PRINT *, "·¨Ïò£º", MESH%TRIANGLES(I)%NORMAL(1), &
+        PRINT *, "ä¸‰è§’å½¢", I, "é¢ç§¯ï¼š", MESH%TRIANGLES(I)%AREA
+        PRINT *, "æ³•å‘ï¼š", MESH%TRIANGLES(I)%NORMAL(1), &
                            MESH%TRIANGLES(I)%NORMAL(2), &
                            MESH%TRIANGLES(I)%NORMAL(3)
-        PRINT *, "ÖØÐÄ£º", MESH%TRIANGLES(I)%CENTROID(1), &
+        PRINT *, "é‡å¿ƒï¼š", MESH%TRIANGLES(I)%CENTROID(1), &
                            MESH%TRIANGLES(I)%CENTROID(2), &
                            MESH%TRIANGLES(I)%CENTROID(3)
     END DO
 
-    ! ´òÓ¡Ã¿¸öÈý½ÇÐÎµÄ¸ßË¹»ý·ÖµãµÄÈ«¾Ö×ø±ê
+    ! æ‰“å°æ¯ä¸ªä¸‰è§’å½¢çš„é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€åæ ‡
     ALLOCATE(GLOBAL_PTS(3, GDATA%N_POINTS))
     DO I = 1, MESH%NUM_TRIANGLE
         CALL GET_TRI_GLOBAL_GAUSS_POINTS(MESH, I, GDATA, GLOBAL_PTS)
-            PRINT *, "Ê¹ÓÃ¸ßË¹", GDATA%N_POINTS, "µãÇó»ý"
+            PRINT *, "ä½¿ç”¨é«˜æ–¯", GDATA%N_POINTS, "ç‚¹æ±‚ç§¯"
             
-            PRINT *, "Èý½ÇÐÎ", I, "µÄËùÓÐ¸ßË¹»ý·ÖµãµÄÈ«¾ÖX×ø±êÎª£º", (GLOBAL_PTS(1, N), N = 1, GDATA%N_POINTS)
-            PRINT *, "Èý½ÇÐÎ", I, "µÄËùÓÐ¸ßË¹»ý·ÖµãµÄÈ«¾ÖY×ø±êÎª£º", (GLOBAL_PTS(2, N), N = 1, GDATA%N_POINTS)
-            PRINT *, "Èý½ÇÐÎ", I, "µÄËùÓÐ¸ßË¹»ý·ÖµãµÄÈ«¾ÖZ×ø±êÎª£º", (GLOBAL_PTS(3, N), N = 1, GDATA%N_POINTS)
+            PRINT *, "ä¸‰è§’å½¢", I, "çš„æ‰€æœ‰é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€Xåæ ‡ä¸ºï¼š", (GLOBAL_PTS(1, N), N = 1, GDATA%N_POINTS)
+            PRINT *, "ä¸‰è§’å½¢", I, "çš„æ‰€æœ‰é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€Yåæ ‡ä¸ºï¼š", (GLOBAL_PTS(2, N), N = 1, GDATA%N_POINTS)
+            PRINT *, "ä¸‰è§’å½¢", I, "çš„æ‰€æœ‰é«˜æ–¯ç§¯åˆ†ç‚¹çš„å…¨å±€Zåæ ‡ä¸ºï¼š", (GLOBAL_PTS(3, N), N = 1, GDATA%N_POINTS)
 
-        PRINT *, "Èý½ÇÐÎ", I, "µÄ¸ßË¹»ý·ÖµãÈ«¾Ö×ø±êÒÑ´òÓ¡Íê±Ï"
+        PRINT *, "ä¸‰è§’å½¢", I, "çš„é«˜æ–¯ç§¯åˆ†ç‚¹å…¨å±€åæ ‡å·²æ‰“å°å®Œæ¯•"
     END DO
     DEALLOCATE(GLOBAL_PTS)
 
-    ! ¶Ô³£Êýº¯Êýf=1ÔÚÃ¿¸öÈý½ÇÐÎÉÏ×ö¸ßË¹»ý·Ö FUNCTION INTEGRATE_LINEAR_ON_TRI(MESH, TRI_ID, GDATA) RESULT(VAL)
+    ! å¯¹å¸¸æ•°å‡½æ•°f=1åœ¨æ¯ä¸ªä¸‰è§’å½¢ä¸Šåšé«˜æ–¯ç§¯åˆ† FUNCTION INTEGRATE_LINEAR_ON_TRI(MESH, TRI_ID, GDATA) RESULT(VAL)
     DO I = 1, MESH%NUM_TRIANGLE
         VAL = INTEGRATE_CONSTANT_ON_TRI(MESH, I, GDATA)
-        PRINT *, "Èý½ÇÐÎ", I, "ÔÚ³£Êýº¯Êýf=1ÉÏµÄ", GDATA%N_POINTS, "µã¸ßË¹»ý·ÖÖµÎª£º", VAL
+        PRINT *, "ä¸‰è§’å½¢", I, "åœ¨å¸¸æ•°å‡½æ•°f=1ä¸Šçš„", GDATA%N_POINTS, "ç‚¹é«˜æ–¯ç§¯åˆ†å€¼ä¸ºï¼š", VAL
     END DO
-    ! ¶Ôº¯Êýf(Y,Y,Z)=XÔÚÃ¿¸öÈý½ÇÐÎÉÏ×ö¸ßË¹»ý·Ö
+    ! å¯¹å‡½æ•°f(Y,Y,Z)=Xåœ¨æ¯ä¸ªä¸‰è§’å½¢ä¸Šåšé«˜æ–¯ç§¯åˆ†
     DO I = 1, MESH%NUM_TRIANGLE
         VAL = INTEGRATE_LINEAR_ON_TRI(MESH, I, GDATA)
-        PRINT *, "Èý½ÇÐÎ", I, "ÔÚº¯Êýf(Y,Y,Z)=XÉÏµÄ", GDATA%N_POINTS, "µã¸ßË¹»ý·ÖÖµÎª£º", VAL
+        PRINT *, "ä¸‰è§’å½¢", I, "åœ¨å‡½æ•°f(Y,Y,Z)=Xä¸Šçš„", GDATA%N_POINTS, "ç‚¹é«˜æ–¯ç§¯åˆ†å€¼ä¸ºï¼š", VAL
     END DO
 
-    ! ¼ÆËãËùÓÐÈý½ÇÐÎ¶ÔÖ®¼äµÄ¸ñÁÖº¯Êý»ý·Ö
+    ! è®¡ç®—æ‰€æœ‰ä¸‰è§’å½¢å¯¹ä¹‹é—´çš„æ ¼æž—å‡½æ•°ç§¯åˆ†
     DO I = 1, MESH%NUM_TRIANGLE
         DO J = 1, MESH%NUM_TRIANGLE
             IF (I == J) THEN
-                PRINT *, "×ÔÏî£ºÔÝÊ±Ìø¹ý"
+                PRINT *, "è‡ªé¡¹ï¼šæš‚æ—¶è·³è¿‡"
                 CYCLE
             END IF
             CALL CALC_GREEN_MATRIX_ELEMENT(MESH, I, J, GDATA, K, Z_MN)
-            PRINT *, "×è¿¹ÔªËØZ_MN(", I, J, ")µÄÄ£ÖµÎª£º", ABS(Z_MN)
+            PRINT *, "é˜»æŠ—å…ƒç´ Z_MN(", I, J, ")çš„æ¨¡å€¼ä¸ºï¼š", ABS(Z_MN)
         END DO
     END DO
-    ! ÑéÖ¤
+    ! éªŒè¯
 
-    DIST = DIST_TRI_CENTROID(MESH, 1, 2) ! ¼ÆËãµÚÒ»¸öºÍµÚ¶þ¸öÈý½ÇÐÎµÄÅ·ÊÏ¾àÀë
+    DIST = DIST_TRI_CENTROID(MESH, 1, 2) ! è®¡ç®—ç¬¬ä¸€ä¸ªå’Œç¬¬äºŒä¸ªä¸‰è§’å½¢çš„æ¬§æ°è·ç¦»
     G_APPROX = CEXP((0.0, -1.0) * K * DIST) / (4.0 * PI * DIST)
 
-    PRINT *, "µÚÒ»¸öÈý½ÇÐÎºÍµÚ¶þ¸öÈý½ÇÐÎµÄ¸ñÁÖº¯ÊýµÄÄ£ÖµÎª£º", &
+    PRINT *, "ç¬¬ä¸€ä¸ªä¸‰è§’å½¢å’Œç¬¬äºŒä¸ªä¸‰è§’å½¢çš„æ ¼æž—å‡½æ•°çš„æ¨¡å€¼ä¸ºï¼š", &
             ABS(G_APPROX * MESH%TRIANGLES(1)%AREA * MESH%TRIANGLES(2) % AREA)
             
-    ! RWG»ùº¯ÊýµÄÑéÖ¤£º
-    PRINT *, "Ã¿¸öRWG»ùº¯ÊýµÄÐÅÏ¢£º"
+    ! RWGåŸºå‡½æ•°çš„éªŒè¯ï¼š
+    PRINT *, "æ¯ä¸ªRWGåŸºå‡½æ•°çš„ä¿¡æ¯ï¼š"
     DO I = 1, MESH%RWG_NUM
-        PRINT *, "¹«¹²±ßµÄ³¤¶ÈÎª£º", MESH%RWG_BASES(I)%LENGTH
-        PRINT *, "¹«¹²±ßµÄIDÎª£º", MESH%RWG_BASES(I)%EDGE_ID
-        PRINT *, "¹«¹²±ß", MESH%RWG_BASES(I)%EDGE_ID, "µÄÕýÈý½ÇÐÎ±àºÅÎª£º", MESH%RWG_BASES(I)%POS_TRI_ID
-        PRINT *, "¹«¹²±ß", MESH%RWG_BASES(I)%EDGE_ID, "µÄ¸ºÈý½ÇÐÎ±àºÅÎª£º", MESH%RWG_BASES(I)%NEG_TRI_ID
-        PRINT *, "¹«¹²±ß", MESH%RWG_BASES(I)%EDGE_ID, "µÄÕýÈý½ÇÐÎf£¨r£©µÄÏµÊýÎª£º", MESH%RWG_BASES(I)%POS_COEF
-        PRINT *, "¹«¹²±ß", MESH%RWG_BASES(I)%EDGE_ID, "µÄ¸ºÈý½ÇÐÎf£¨r£©µÄÏµÊýÎª£º", MESH%RWG_BASES(I)%NEG_COEF
+        PRINT *, "å…¬å…±è¾¹çš„é•¿åº¦ä¸ºï¼š", MESH%RWG_BASES(I)%LENGTH
+        PRINT *, "å…¬å…±è¾¹çš„IDä¸ºï¼š", MESH%RWG_BASES(I)%EDGE_ID
+        PRINT *, "å…¬å…±è¾¹", MESH%RWG_BASES(I)%EDGE_ID, "çš„æ­£ä¸‰è§’å½¢ç¼–å·ä¸ºï¼š", MESH%RWG_BASES(I)%POS_TRI_ID
+        PRINT *, "å…¬å…±è¾¹", MESH%RWG_BASES(I)%EDGE_ID, "çš„è´Ÿä¸‰è§’å½¢ç¼–å·ä¸ºï¼š", MESH%RWG_BASES(I)%NEG_TRI_ID
+        PRINT *, "å…¬å…±è¾¹", MESH%RWG_BASES(I)%EDGE_ID, "çš„æ­£ä¸‰è§’å½¢fï¼ˆrï¼‰çš„ç³»æ•°ä¸ºï¼š", MESH%RWG_BASES(I)%POS_COEF
+        PRINT *, "å…¬å…±è¾¹", MESH%RWG_BASES(I)%EDGE_ID, "çš„è´Ÿä¸‰è§’å½¢fï¼ˆrï¼‰çš„ç³»æ•°ä¸ºï¼š", MESH%RWG_BASES(I)%NEG_COEF
     END DO
     
-    PRINT *, "µÚÒ»¸ö»ùº¯ÊýµÄÐÅÏ¢£º"
-    PRINT *, "µÚÒ»¸ö»ùº¯Êý¹«¹²±ßÖÐµã×ø±êÎª£º", &
+    PRINT *, "ç¬¬ä¸€ä¸ªåŸºå‡½æ•°çš„ä¿¡æ¯ï¼š"
+    PRINT *, "ç¬¬ä¸€ä¸ªåŸºå‡½æ•°å…¬å…±è¾¹ä¸­ç‚¹åæ ‡ä¸ºï¼š", &
                 (MESH%EDGES(MESH%RWG_BASES(1)%EDGE_ID)%MIDPOINT(I), I = 1, 3)
     
     CALL EVAL_RWG_BASIS(MESH, MESH%RWG_BASES(1), "POS", &
                         MESH%TRIANGLES(MESH%RWG_BASES(1)%POS_TRI_ID)%CENTROID, F_VAL_POS)
-    PRINT *, "µÚÒ»¸ö»ùº¯ÊýÕýÈý½ÇÐÎÖØÐÄµÄf£¨r£©µÄÖµÎª£º", F_VAL_POS
+    PRINT *, "ç¬¬ä¸€ä¸ªåŸºå‡½æ•°æ­£ä¸‰è§’å½¢é‡å¿ƒçš„fï¼ˆrï¼‰çš„å€¼ä¸ºï¼š", F_VAL_POS
 
-    ! ÑéÖ¤£º¹«¹²±ßÖÐµã
-    PRINT *, " ¹«¹²±ßÖÐµãÑéÖ¤: "
+    ! éªŒè¯ï¼šå…¬å…±è¾¹ä¸­ç‚¹
+    PRINT *, " å…¬å…±è¾¹ä¸­ç‚¹éªŒè¯: "
     CALL EVAL_RWG_BASIS(MESH, MESH%RWG_BASES(1), "POS", &
                         MESH%EDGES(MESH%RWG_BASES(1)%EDGE_ID)%MIDPOINT, F_VAL_POS)
     CALL EVAL_RWG_BASIS(MESH, MESH%RWG_BASES(1), "NEG", &
@@ -167,35 +168,31 @@ PROGRAM TETRAHENDRON_MESH
 
     PRINT *, "POS: ", F_VAL_POS
     PRINT *, "NEG: ", F_VAL_NEG
-    PRINT *, "Ä£: ", SQRT(SUM(F_VAL_POS**2)), SQRT(SUM(F_VAL_NEG**2))
+    PRINT *, "æ¨¡: ", SQRT(SUM(F_VAL_POS**2)), SQRT(SUM(F_VAL_NEG**2))
 
-    ! ´òÓ¡EFIE×è¿¹ÔªËØ
+    ! æ‰“å°EFIEé˜»æŠ—å…ƒç´ 
     DO I = 1, MESH%RWG_NUM
         DO J = 1, MESH%RWG_NUM
-            IF (I == J) THEN
-                PRINT *, "×ÔÏî£¬ÔÝÊ±Ìø¹ý"
-                CYCLE
-            END IF
             CALL CALC_EFIE_MATRIX_ELEMENT(MESH, MESH%RWG_BASES(I), &
-                        MESH%RWG_BASES(J), GDATA, K, ETA0, Z_MN)    
-            PRINT *, "EFIE Z(", I, J, ")Ä£Öµ: ", ABS(Z_MN)
+                        MESH%RWG_BASES(J), GDATA, K, ETA0, Z_MN)
+            PRINT *, "EFIE Z(", I, J, ")æ¨¡å€¼: ", ABS(Z_MN)
         END DO
     END DO
 
-    ! ´òÓ¡MFIE×è¿¹ÔªËØ
+    ! æ‰“å°MFIEé˜»æŠ—å…ƒç´ 
     DO M = 1, MESH%RWG_NUM
         DO N = 1, MESH%RWG_NUM
             IF (M == N) THEN
-                PRINT *, "×ÔÏî£¬ÔÝÊ±Ìø¹ý"
+                PRINT *, "è‡ªé¡¹ï¼Œæš‚æ—¶è·³è¿‡"
                 CYCLE
             END IF
             CALL CALC_MFIE_MATRIX_ELEMENT(MESH, MESH%RWG_BASES(M), &
                         MESH%RWG_BASES(N), GDATA, K, Z_MN)    
-            PRINT *, "MFIE Z(", M, N, ")Ä£Öµ: ", ABS(Z_MN)
+            PRINT *, "MFIE Z(", M, N, ")æ¨¡å€¼: ", ABS(Z_MN)
         END DO
     END DO
     
-    ! ¾ØÕó´æ´¢ÓëCFIE×éºÏ
+    ! çŸ©é˜µå­˜å‚¨ä¸ŽCFIEç»„åˆ
     IF(ALLOCATED(Z_E)) DEALLOCATE(Z_E)
     IF(ALLOCATED(Z_M)) DEALLOCATE(Z_M)
     IF(ALLOCATED(Z_CFIE)) DEALLOCATE(Z_CFIE)
@@ -203,7 +200,7 @@ PROGRAM TETRAHENDRON_MESH
     ALLOCATE(Z_M(MESH%RWG_NUM, MESH%RWG_NUM))
     ALLOCATE(Z_CFIE(MESH%RWG_NUM, MESH%RWG_NUM))
 
-    ! Ò»¶¨Òª³õÊ¼»¯£¡£¡£¡²»È»»áÊýÖµ±¬Õ¨
+    ! ä¸€å®šè¦åˆå§‹åŒ–ï¼ï¼ï¼ä¸ç„¶ä¼šæ•°å€¼çˆ†ç‚¸
     Z_E = (0.0, 0.0)
     Z_M = (0.0, 0.0)
     Z_CFIE = (0.0, 0.0)
@@ -211,7 +208,7 @@ PROGRAM TETRAHENDRON_MESH
     DO M = 1, MESH%RWG_NUM
         DO N = 1, MESH%RWG_NUM
             IF (M == N) THEN
-                PRINT *, "×ÔÏî£¬ÔÝÊ±Ìø¹ý"
+                PRINT *, "è‡ªé¡¹ï¼Œæš‚æ—¶è·³è¿‡"
                 CYCLE
             END IF
 
@@ -219,31 +216,31 @@ PROGRAM TETRAHENDRON_MESH
                                 MESH%RWG_BASES(N), GDATA, K, ETA0, Z_E(M, N))
             CALL CALC_MFIE_MATRIX_ELEMENT(MESH, MESH%RWG_BASES(M), &
                                 MESH%RWG_BASES(N), GDATA, K, Z_M(M, N))
-            PRINT *, "Z_E(", M, N, ")Ä£Öµ: ", ABS(Z_E(M, N))
-            PRINT *, "Z_M(", M, N, ")Ä£Öµ: ", ABS(Z_M(M, N))
+            PRINT *, "Z_E(", M, N, ")æ¨¡å€¼: ", ABS(Z_E(M, N))
+            PRINT *, "Z_M(", M, N, ")æ¨¡å€¼: ", ABS(Z_M(M, N))
         END DO
     END DO
 
-    ! CFIE×éºÏ
+    ! CFIEç»„åˆ
     ALPHA = 0.5
 
     DO M = 1, MESH%RWG_NUM
         DO N = 1, MESH%RWG_NUM
             IF (M == N) THEN
-                PRINT *, "×ÔÏî£¬ÔÝÊ±Ìø¹ý"
+                PRINT *, "è‡ªé¡¹ï¼Œæš‚æ—¶è·³è¿‡"
                 CYCLE
             END IF
             Z_CFIE(M, N) = ALPHA * Z_E(M, N) + (1.0 - ALPHA) * ETA0 * Z_M(M, N)
-            PRINT *, "Z_CFIE(", M, N, ")Ä£Öµ: ", ABS(Z_CFIE(M, N))
+            PRINT *, "Z_CFIE(", M, N, ")æ¨¡å€¼: ", ABS(Z_CFIE(M, N))
         END DO
     END DO
     
     IF (ABS(DOT_PRODUCT(K_HAT, E_POL)) > 1.0E-6) THEN
-        PRINT *, "´íÎó£º¼«»¯·½ÏòÓë´«²¥·½Ïò²»Õý½»"
+        PRINT *, "é”™è¯¯ï¼šæžåŒ–æ–¹å‘ä¸Žä¼ æ’­æ–¹å‘ä¸æ­£äº¤"
         STOP
     END IF
 
-    ! ÑéÖ¤ÓÒ¶ËÏî
+    ! éªŒè¯å³ç«¯é¡¹
     IF(ALLOCATED(V_M_E)) DEALLOCATE(V_M_E)
     IF(ALLOCATED(V_M_M)) DEALLOCATE(V_M_M)
     IF(ALLOCATED(V_CFIE)) DEALLOCATE(V_CFIE)
@@ -255,8 +252,8 @@ PROGRAM TETRAHENDRON_MESH
         CALL CALC_MFIE_RHS(MESH, MESH%RWG_BASES(M), GDATA, K, K_HAT, E_POL, E0, ETA0, V_M_M(M))
         V_CFIE(M) = ALPHA * V_M_E(M) + (1.0 - ALPHA) * ETA0 * V_M_M(M)
         PRINT *, "RWG", M, &
-                "V_M_EÄ£:", ABS(V_M_E(M)), &
-                "V_M_MÄ£:", ABS(V_M_M(M)), &
-               "V_CFIEÄ£:", ABS(V_CFIE(M))
+                "V_M_Eæ¨¡:", ABS(V_M_E(M)), &
+                "V_M_Mæ¨¡:", ABS(V_M_M(M)), &
+               "V_CFIEæ¨¡:", ABS(V_CFIE(M))
     END DO
 END PROGRAM

@@ -1,35 +1,69 @@
-# ±àÒëÆ÷
+# ç¼–è¯‘å™¨
 FC = gfortran
-# ±àÒëÑ¡Ïî£º¼ì²éËùÓĞ¾¯¸æ¡¢ÆôÓÃ¸¡µãÏİÚå
-FFLAGS = -Wall -Wextra -fcheck=all
+CXX = g++
+# ç¼–è¯‘é€‰é¡¹ï¼šæ£€æŸ¥æ‰€æœ‰è­¦å‘Šã€å¯ç”¨æµ®ç‚¹é™·é˜±
+FFLAGS = -O2 -Wall -Wextra -fcheck=all -ffree-line-length-none
+CXXFLAGS = -O2 -std=c++11 -IDIRECTFN-master/include
 
-# Ô´ÎÄ¼şÁĞ±í£¨°´ÒÀÀµË³ĞòĞ´¸ü±£ÏÕ£¬µ« gfortran Ò»°ãÄÜ×Ô¶¯ÅÅ£©
-# Ìí¼ÓĞÂÎÄ¼ş£ºÔÚ MAIN.F90 Ö®Ç°²åÈëÒ»ĞĞ£¬ĞĞÎ²¼Ó·´Ğ±¸Ü \£¬×îºóÒ»ĞĞ²»Òª¼Ó\
+# DIRECTFN C++ é™æ€åº“ä¸åŒ…è£…å±‚
+DFN_LIB = DIRECTFN-master/build/libdirectfn.a
+DFN_WRAPPER = DIRECTFN_WRAPPER.o
 
-SRC = EM_TYPES.f90 \
-      MESH_GEOMETRY.f90 \
-      NUMERICAL_INTEGRATION.f90 \
-      GREEN_FUNCTIONS.f90 \
-      RWG_BASIS_BUILD.f90 \
-      Z_MATRIX.f90 \
-      RHS.f90 \
-      MAIN.f90
+# å…¬å…±æ¨¡å—ï¼ˆæ—  main ç¨‹åºï¼‰
+MODS = EM_TYPES.f90 \
+       MESH_GEOMETRY.f90 \
+       NUMERICAL_INTEGRATION.f90 \
+       GREEN_FUNCTIONS.f90 \
+       RWG_BASIS_BUILD.f90 \
+       SINGULAR_INTEFRAL.F90 \
+       QBX_EFIE.f90 \
+       DIRECTFN_BRIDGE.f90 \
+       Z_MATRIX.f90 \
+       RHS.f90
 
-# Ä¿±ê¿ÉÖ´ĞĞÎÄ¼ş
-TARGET = mom_solver
+# åŸ mom_solverï¼šå››é¢ä½“æµ‹è¯•
+SRC_MOM = $(MODS) MAIN.f90
+TARGET_MOM = mom_solver
 
-# Ä¬ÈÏ¹æÔò£º±àÒëËùÓĞ
-all: $(TARGET)
+# RCS æ±‚è§£å™¨ï¼šé‡‘å±çƒ RCS è®¡ç®—
+SRC_RCS = $(MODS) FAR_FIELD.f90 MAIN_RCS.f90
+TARGET_RCS = rcs_solver
 
-$(TARGET): $(SRC)
-	$(FC) $(FFLAGS) $(SRC) -o $(TARGET)
+# é»˜è®¤è§„åˆ™
+all: $(TARGET_MOM) $(TARGET_RCS)
 
-# ±àÒë²¢ÔËĞĞ£¨Ò»¼üÖ´ĞĞ£©
-run: $(TARGET)
-	./$(TARGET)
+$(DFN_WRAPPER): DIRECTFN_WRAPPER.cpp
+	$(CXX) $(CXXFLAGS) -c DIRECTFN_WRAPPER.cpp -o $(DFN_WRAPPER)
 
-# ÇåÀí±àÒëÀ¬»ø
+$(TARGET_MOM): $(SRC_MOM) $(DFN_WRAPPER)
+	$(FC) $(FFLAGS) $(SRC_MOM) $(DFN_WRAPPER) $(DFN_LIB) -lstdc++ -o $(TARGET_MOM)
+
+$(TARGET_RCS): $(SRC_RCS) $(DFN_WRAPPER)
+	$(FC) $(FFLAGS) $(SRC_RCS) $(DFN_WRAPPER) $(DFN_LIB) -lstdc++ -o $(TARGET_RCS)
+
+# è¿è¡ŒåŸæµ‹è¯•
+run: $(TARGET_MOM)
+	chcp.com 65001
+	$(TARGET_MOM)
+
+# è¿è¡Œ RCS è®¡ç®—
+rcs: $(TARGET_RCS)
+	chcp.com 65001
+	$(TARGET_RCS)
+
+# æ¸…ç†ç¼–è¯‘åƒåœ¾
 clean:
-	rm -f $(TARGET) *.o *.mod
+	rm -f $(TARGET_MOM) $(TARGET_RCS) *.o *.mod
 
-.PHONY: all run clean
+# è¿è¡Œå¥‡å¼‚ç§¯åˆ†éªŒè¯
+test: test_singular.exe
+	chcp.com 65001
+	test_singular.exe
+
+test_singular.exe: EM_TYPES.f90 NUMERICAL_INTEGRATION.f90 GREEN_FUNCTIONS.f90 SINGULAR_INTEFRAL.F90 test_singular.F90
+	$(FC) $(FFLAGS) EM_TYPES.f90 NUMERICAL_INTEGRATION.f90 GREEN_FUNCTIONS.f90 SINGULAR_INTEFRAL.F90 test_singular.F90 -o test_singular.exe
+
+# DIRECTFN æ¡¥æ¥å•å…ƒæµ‹è¯•ï¼ˆtest_directfnï¼‰å·²éšè°ƒè¯•å®Œæˆåˆ é™¤ã€‚
+# å¦‚éœ€é‡æ–°é€å…ƒéªŒè¯ï¼Œå¯ç”¨ DIRECTFN_BRIDGE çš„ DIRECTFN_DEBUG æ ‡å¿—ï¼ˆ>0 æ‰“å° @@DFNRAW åŸå§‹ç§¯åˆ†å€¼ï¼‰ã€‚
+
+.PHONY: all run rcs clean test

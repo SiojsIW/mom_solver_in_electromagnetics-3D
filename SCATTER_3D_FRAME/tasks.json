@@ -1,0 +1,21 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build MoM Solver",
+            "type": "shell",
+            "command": "gfortran",
+            "args": [
+                "-ffree-line-length-none",
+                "${workspaceFolder}/*.F90",
+                "-o",
+                "${workspaceFolder}/mom_solver.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

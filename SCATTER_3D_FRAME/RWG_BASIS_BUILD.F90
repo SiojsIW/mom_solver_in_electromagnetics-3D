@@ -3,14 +3,14 @@ MODULE RWG_BASIS_BUILD
     IMPLICIT NONE
 CONTAINS
 
-    ! ½¨Á¢RWG»ùº¯Êý£¨Í³¼Æ¹«¹²±ßÊýÁ¿£¬ÎªÃ¿¸ö±ß½¨Á¢RWG»ùº¯Êý£©
+    ! å»ºç«‹RWGåŸºå‡½æ•°ï¼ˆç»Ÿè®¡å…¬å…±è¾¹æ•°é‡ï¼Œä¸ºæ¯ä¸ªè¾¹å»ºç«‹RWGåŸºå‡½æ•°ï¼‰
     SUBROUTINE BUILD_RWG_BASIS(MESH)
         TYPE(MESH_3D), INTENT(INOUT) :: MESH
         INTEGER :: I, J, K
         
         K = 1
 
-        ! Í³¼ÆRWG»ùº¯ÊýµÄ¸öÊý
+        ! ç»Ÿè®¡RWGåŸºå‡½æ•°çš„ä¸ªæ•°
         DO I = 1, MESH%NUM_EDGE
             IF(MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
                 MESH%RWG_NUM = MESH%RWG_NUM + 1
@@ -20,7 +20,7 @@ CONTAINS
         IF (ALLOCATED(MESH%RWG_BASES)) DEALLOCATE(MESH%RWG_BASES)
         ALLOCATE(MESH%RWG_BASES(MESH%RWG_NUM))
 
-        ! ÕÒ¸öÃ¿¸ö¹«¹²±ß¶ÔÓ¦µÄID
+        ! æ‰¾ä¸ªæ¯ä¸ªå…¬å…±è¾¹å¯¹åº”çš„ID
         DO I = 1, MESH%NUM_EDGE
             IF(MESH%EDGES(I)%NUMBER_SHARED_TPI == 2) THEN
                 MESH%RWG_BASES(K)%EDGE_ID = I
@@ -28,14 +28,14 @@ CONTAINS
             END IF
         END DO
 
-        DO I = 1, MESH%RWG_NUM ! ±ßÑ­»·
+        DO I = 1, MESH%RWG_NUM ! è¾¹å¾ªçŽ¯
             MESH%RWG_BASES(I)%POS_TRI_ID = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%SHARED_TRI_IDS(1)
             MESH%RWG_BASES(I)%NEG_TRI_ID = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%SHARED_TRI_IDS(2)
 
-            ! ÕÒµ½Ã¿¸ö¹«¹²±ß¶ÔÓ¦µÄ³¤¶È
+            ! æ‰¾åˆ°æ¯ä¸ªå…¬å…±è¾¹å¯¹åº”çš„é•¿åº¦
             MESH%RWG_BASES(I)%LENGTH = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH
 
-            ! ÕÒµ½¹«¹²±ßµÄ¶Ô¶¥µã
+            ! æ‰¾åˆ°å…¬å…±è¾¹çš„å¯¹é¡¶ç‚¹
             DO J = 1, 3 
                 IF (MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V1_ID .AND. &
                     MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%VERTEX_3D(J) /= MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%V2_ID) THEN
@@ -47,7 +47,7 @@ CONTAINS
                 END IF
             END DO
             
-            !  ¼ÆËãf£¨r£©µÄÏµÊý
+            !  è®¡ç®—fï¼ˆrï¼‰çš„ç³»æ•°
             MESH%RWG_BASES(I)%POS_COEF = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH / &
                                             (2.0 * (MESH%TRIANGLES(MESH%RWG_BASES(I)%POS_TRI_ID)%AREA))
             MESH%RWG_BASES(I)%NEG_COEF = MESH%EDGES(MESH%RWG_BASES(I)%EDGE_ID)%LENGTH / &
@@ -56,12 +56,12 @@ CONTAINS
         END DO
     END SUBROUTINE
 
-    ! ¶ÔÄ³Ò»¸öRWG»ùº¯Êý£¬¼ÆËãf£¨r£©(3Î¬£¬X,Y,Z)
+    ! å¯¹æŸä¸€ä¸ªRWGåŸºå‡½æ•°ï¼Œè®¡ç®—fï¼ˆrï¼‰(3ç»´ï¼ŒX,Y,Z)
     SUBROUTINE EVAL_RWG_BASIS(MESH, RWG, TRI_LOCAL, R_PT, F_VAL)
         TYPE(MESH_3D), INTENT(IN) :: MESH
         TYPE(RWG_BASIS), INTENT(IN) :: RWG
         CHARACTER * 3, INTENT(IN) :: TRI_LOCAL
-        REAL, INTENT(IN) :: R_PT(3) ! ³¡µãÈ«¾Ö×ø±ê
+        REAL, INTENT(IN) :: R_PT(3) ! åœºç‚¹å…¨å±€åæ ‡
         REAL, INTENT(OUT) :: F_VAL(3)
 
 
